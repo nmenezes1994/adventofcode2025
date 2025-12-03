@@ -4,21 +4,23 @@ if __name__ == '__main__':
 
     with open('/home/nmenezes/repos/adventofcode2025/day1/secret_entrance/input.txt', 'r', encoding='utf-8') as f:
         for line in f:
-            direction = line[0]
-            delta = int(line[1:])
-            full_rotations = abs(delta) // 100
-            delta %= 100
             initial_position = position
 
+            direction = line[0]
+            delta= int(line[1:])
+
+            full_rotations = abs(delta) // 100
             password += full_rotations
+            
+            rotation = delta % 100
 
             match direction:
                 case 'L':
-                    position -= delta
+                    position -= rotation
                 case 'R':
-                    position += delta
+                    position += rotation
             
-            if initial_position != 0 and (position < 0 or position > 100):
+            if (initial_position != 0 and position < 0) or position > 100:
                 password += 1
 
             position %= 100
