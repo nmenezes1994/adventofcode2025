@@ -24,53 +24,38 @@ def get_fresh_id_ranges(file_name: str) -> list[tuple[int, int]]:
 def count_fresh_ids(fresh_id_ranges: list[tuple[int, int]]) -> int:
     num_fresh_ids: int = 0
 
-    for range_index, fresh_id_range in enumerate(fresh_id_ranges):
-        unique_ids_in_range: int = fresh_id_range[UPPER] - fresh_id_range[LOWER] + 1
+    merged_fresh_ids_ranges = merge_id_ranges(fresh_id_ranges)
 
-        for previous_fresh_id_range in fresh_id_ranges[:range_index]:
-            if not (fresh_id_range[UPPER] < previous_fresh_id_range[LOWER] or fresh_id_range[LOWER] > previous_fresh_id_range[UPPER]):
-                if fresh_id_range[LOWER] < previous_fresh_id_range[LOWER] and fresh_id_range[UPPER] <= previous_fresh_id_range[UPPER]:
-                    unique_ids_in_range -= fresh_id_range[UPPER] - previous_fresh_id_range[LOWER] + 1
-                elif fresh_id_range[UPPER] > previous_fresh_id_range[UPPER] and fresh_id_range[LOWER] >= previous_fresh_id_range[LOWER]:
-                    unique_ids_in_range -= previous_fresh_id_range[UPPER] - fresh_id_range[LOWER] + 1
-                elif (fresh_id_range[UPPER] - fresh_id_range[LOWER]) > (previous_fresh_id_range[UPPER] - previous_fresh_id_range[LOWER]):
-                    unique_ids_in_range -= previous_fresh_id_range[UPPER] - previous_fresh_id_range[LOWER] + 1
-                else:
-                    unique_ids_in_range = 0
-
-        num_fresh_ids += unique_ids_in_range
+    for fresh_id_range in merged_fresh_ids_ranges:
+        num_fresh_ids += fresh_id_range[UPPER] - fresh_id_range[LOWER] + 1
 
     return num_fresh_ids
 
-# def count_fresh_ids(fresh_id_ranges: list[tuple[int, int]]) -> int:
-#     num_fresh_ids: int = 0
+def merge_id_ranges(id_ranges: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    merged_id_ranges: list[tuple[int, int]] = id_ranges
 
-#     merged_fresh_ids_ranges = merge_ranges(fresh_id_ranges)
+    while True:
+        next_merged_id_ranges: list[tuple[int, int]] = []
+        merged_id_range_indexes: set[tuple[int, int]] = set()
 
-#     for fresh_id_range in merged_fresh_ids_ranges:
-#         num_fresh_ids += fresh_id_range[UPPER] - fresh_id_range[LOWER] + 1
+        for id_range_index, current_id_range in enumerate(merged_id_ranges):
+            if current_id_range not in merged_id_range_indexes:
+                next_id_range: tuple[int, int] = current_id_range
 
-#     return num_fresh_ids
+                for id_range_to_compare in merged_id_ranges[id_range_index + 1:]:
+                    if (id_range_to_compare not in merged_id_range_indexes) and not (next_id_range[UPPER] < id_range_to_compare[LOWER] or next_id_range[LOWER] > id_range_to_compare[UPPER]):
+                        # There is an overlap between the current ID range and the next one in the list, so merge the two
+                        next_id_range = (min(next_id_range[LOWER], id_range_to_compare[LOWER]), max(next_id_range[UPPER], id_range_to_compare[UPPER]))
+                        merged_id_range_indexes.add(id_range_to_compare)
 
-def merge_ranges(ranges: list[tuple[int, int]]) -> list[tuple[int, int]]:
-    merged_ranges: list[tuple[int, int]] = [ranges[0]]
+                next_merged_id_ranges.append(next_id_range)
 
-    for range in ranges[1:]:
-        candidate_range: list[tuple[int, int]] = [range]
+        merged_id_ranges = next_merged_id_ranges
 
-        for merged_range in merged_ranges:
-            if not (range[UPPER] < merged_range[LOWER] or range[LOWER] > merged_range[UPPER]):
-                if range[LOWER] < merged_range[LOWER] and range[UPPER] <= merged_range[UPPER]:
-                    candidate_range = [(range[LOWER], merged_range[LOWER] - 1)]
-                elif range[UPPER] > merged_range[UPPER] and range[LOWER] >= merged_range[LOWER]:
-                    candidate_range = [(merged_range[UPPER] + 1, range[UPPER])]
-                elif (range[UPPER] - range[LOWER]) > (merged_range[UPPER] - merged_range[LOWER]):
-                    candidate_range = [(range[LOWER], merged_range[LOWER] - 1), (merged_range[UPPER] + 1, range[UPPER])]
-                # range = (min(range[LOWER], merged_range[LOWER]), max(range[UPPER], merged_range[UPPER]))
-        
-        merged_ranges.extend(candidate_range)
+        if not merged_id_range_indexes:
+            break
 
-    return merged_ranges
+    return merged_id_ranges
 
 if __name__ == '__main__':
     main(sys.argv)
