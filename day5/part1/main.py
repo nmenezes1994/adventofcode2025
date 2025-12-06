@@ -6,8 +6,8 @@ def main(args: list[str]) -> None:
     print(f'The result is {len(fresh_available_ids)}')
 
 def get_ids(file_name: str) -> tuple[list[tuple[int, int]], list[int]]:
-    fresh_id_ranges = []
-    available_ids = []
+    fresh_id_ranges: list[tuple[int, int]] = []
+    available_ids: list[int] = []
 
     with open(file_name, 'r', encoding='utf-8') as f:
         in_fresh_id_range_section = True
