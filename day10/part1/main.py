@@ -24,7 +24,7 @@ def main(args: list[str]) -> None:
             for combination_size in range(1, MAX_COMBINATION_SIZE + 1):
                 combination_found: bool = False
                 button_combinations = itertools.combinations_with_replacement(buttons, combination_size)
-                for button_combination in list(button_combinations):
+                for button_combination in button_combinations:
                     pass
                     indicator_lights: list[int] = [0 for _ in range(len(target_indicator_lights))]
                     for button in button_combination:
