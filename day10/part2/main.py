@@ -26,7 +26,7 @@ def main(args: list[str]) -> None:
             for combination_size in range(min_combination_size, min_combination_size + MAX_COMBINATION_ITERATIONS + 1):
                 combination_found: bool = False
                 button_combinations = itertools.combinations_with_replacement(buttons, combination_size)
-                for button_combination in list(button_combinations):
+                for button_combination in button_combinations:
                     pass
                     joltage_levels: list[int] = [0 for _ in range(len(target_joltage_levels))]
                     for button in button_combination:
